@@ -45,6 +45,9 @@ kotlin {
             implementation(libs.kstore)
 
             implementation("de.jensklingenberg.ktorfit:ktorfit-lib:2.6.4")
+            implementation("io.ktor:ktor-client-auth:3.2.3")
+            implementation("io.ktor:ktor-serialization-kotlinx-json:3.2.3")
+            implementation("io.ktor:ktor-client-content-negotiation:3.2.3")
         }
 
         commonTest.dependencies {
