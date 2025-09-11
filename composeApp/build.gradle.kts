@@ -48,6 +48,11 @@ kotlin {
             implementation("io.ktor:ktor-client-auth:3.2.3")
             implementation("io.ktor:ktor-serialization-kotlinx-json:3.2.3")
             implementation("io.ktor:ktor-client-content-negotiation:3.2.3")
+
+            implementation(libs.koin.core)
+            implementation(libs.koin.compose)
+            implementation(libs.koin.compose.viewmodel)
+            implementation(libs.koin.compose.viewmodel.navigation)
         }
 
         commonTest.dependencies {
