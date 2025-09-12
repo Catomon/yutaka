@@ -1,8 +1,10 @@
 package io.github.catomon.yutaka.di
 
 import de.jensklingenberg.ktorfit.Ktorfit
-import io.github.catomon.yutaka.data.remote.dto.DanbooruApi
-import io.github.catomon.yutaka.data.remote.dto.createDanbooruApi
+import io.github.catomon.yutaka.data.remote.DanbooruApi
+import io.github.catomon.yutaka.data.remote.SafebooruApi
+import io.github.catomon.yutaka.data.remote.createDanbooruApi
+import io.github.catomon.yutaka.data.remote.createSafebooruApi
 import io.github.catomon.yutaka.tokenBooru
 import io.github.catomon.yutaka.usernameBooru
 import io.ktor.client.plugins.auth.Auth
@@ -38,6 +40,21 @@ val commonModule = module {
             .baseUrl("https://danbooru.donmai.us/")
             .build()
             .createDanbooruApi()
+    }
+
+    single<SafebooruApi> {
+        Ktorfit.Builder()
+            .httpClient {
+                install(ContentNegotiation) {
+                    json(Json {
+                        ignoreUnknownKeys = true
+                        prettyPrint = true
+                    })
+                }
+            }
+            .baseUrl("https://safebooru.org/")
+            .build()
+            .createSafebooruApi()
     }
 }
 

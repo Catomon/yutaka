@@ -1,6 +1,5 @@
 package io.github.catomon.yutaka.data.remote.dto
 
-import io.github.catomon.yutaka.util.InstantSerializer
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import kotlin.time.ExperimentalTime
@@ -9,7 +8,7 @@ import kotlinx.serialization.SerialName
 
 @OptIn(ExperimentalTime::class)
 @Serializable
-data class PostItemDto(
+data class DanbooruPostDto(
     @SerialName("id") val id: Int,
     @SerialName("uploader_id") val uploaderId: Int,
     @SerialName("approver_id") val approverId: Int?,

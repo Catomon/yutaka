@@ -3,7 +3,6 @@ package io.github.catomon.yutaka.ui
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -12,19 +11,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
-import io.github.catomon.yutaka.data.mappers.toDomain
-import io.github.catomon.yutaka.data.remote.dto.DanbooruApi
-import io.github.catomon.yutaka.data.remote.dto.PostItemDto
+import io.github.catomon.yutaka.domain.BooruProvider
 import io.github.catomon.yutaka.domain.Post
 import io.ktor.client.plugins.HttpRequestTimeoutException
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.jsonArray
 import java.net.SocketException
 import java.util.concurrent.CancellationException
 
 @Composable
-fun MainScreen(api: DanbooruApi) {
+fun MainScreen(booru: BooruProvider) {
     var page by remember { mutableStateOf(1) }
     var posts by remember { mutableStateOf(emptyList<Post>()) }
     var tries by remember { mutableStateOf(0) }
@@ -32,7 +26,7 @@ fun MainScreen(api: DanbooruApi) {
     var viewPost by remember { mutableStateOf<Post?>(null) }
 
     LoadPostsEffect(
-        api = api, tries = tries,
+        booru = booru, tries = tries,
         onPostsLoaded = { posts = it },
         onStatusUpdate = { status = it },
         page = page
@@ -68,34 +62,22 @@ fun MainScreen(api: DanbooruApi) {
 
 }
 
+const val MIN_SCORE = 0
+const val PAGE_LIMIT = 40
+
 @Composable
 fun LoadPostsEffect(
-    api: DanbooruApi,
+    booru: BooruProvider,
     tries: Int,
     onPostsLoaded: (List<Post>) -> Unit,
     onStatusUpdate: (String) -> Unit,
     page: Int,
 ) {
-    val json = remember {
-        Json { ignoreUnknownKeys = true; isLenient = true }
-    }
-
     LaunchedEffect(tries, page) {
-        val posts: MutableList<PostItemDto> = mutableListOf()
         try {
-            val jsonArray = api.getPosts(tags = "lucky_star", limit = 40, page = page).jsonArray
-            for (jsonElement in jsonArray) {
-                try {
-                    val post = json.decodeFromJsonElement(PostItemDto.serializer(), jsonElement)
-                    if (post.rating in listOf("g", "s")) { //g, s, q, e
-                        posts.add(post)
-                    }
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
-            }
+            val posts = booru.getPosts(tags = "lucky_star", limit = PAGE_LIMIT, page = page)
             onStatusUpdate("Success")
-            onPostsLoaded(posts.mapNotNull { if (it.score >= 4) it.toDomain() else null })
+            onPostsLoaded(posts.filter { it.score >= MIN_SCORE })
         } catch (e: HttpRequestTimeoutException) {
             onStatusUpdate("Request Timeout")
             e.printStackTrace()

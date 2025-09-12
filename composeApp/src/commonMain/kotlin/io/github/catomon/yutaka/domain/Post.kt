@@ -9,6 +9,7 @@ data class Post(
     val details: String,
     val author: String,
     val source: String,
+    val score: Int,
     val tags: List<String>,
     val fileExt: String,
 )

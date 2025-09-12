@@ -15,3 +15,4 @@ Pods/
 *.jks
 *.gpg
 *yarn.lock
+/composeApp/src/commonMain/kotlin/io/github/catomon/yutaka/DanbooruCredentials.kt

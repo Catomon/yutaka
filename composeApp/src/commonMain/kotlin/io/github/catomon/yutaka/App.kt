@@ -7,7 +7,10 @@ import coil3.request.crossfade
 import coil3.request.maxBitmapSize
 import coil3.size.Precision
 import coil3.size.Size
-import io.github.catomon.yutaka.data.remote.dto.DanbooruApi
+import io.github.catomon.yutaka.data.remote.DanbooruApi
+import io.github.catomon.yutaka.data.remote.DanbooruProvider
+import io.github.catomon.yutaka.data.remote.SafebooruApi
+import io.github.catomon.yutaka.data.remote.SafebooruProvider
 import io.github.catomon.yutaka.di.commonModule
 import io.github.catomon.yutaka.ui.MainScreen
 import io.github.catomon.yutaka.ui.theme.AppTheme
@@ -25,7 +28,8 @@ internal fun App() = AppTheme {
         modules(commonModule)
     }
 
-    val api = get<DanbooruApi>(DanbooruApi::class.java)
+    val danbooru = get<DanbooruApi>(DanbooruApi::class.java) //todo
+    //val safebooru = get<SafebooruApi>(SafebooruApi::class.java)
 
     setSingletonImageLoaderFactory { context ->
         ImageLoader.Builder(context)
@@ -35,5 +39,6 @@ internal fun App() = AppTheme {
             .build()
     }
 
-    MainScreen(api)
+    MainScreen(DanbooruProvider(danbooru))
+    //MainScreen(SafebooruProvider(safebooru))
 }

@@ -1,4 +1,4 @@
-package io.github.catomon.yutaka.data.remote.dto
+package io.github.catomon.yutaka.data.remote
 
 import de.jensklingenberg.ktorfit.http.GET
 import de.jensklingenberg.ktorfit.http.Query
@@ -10,7 +10,7 @@ interface DanbooruApi {
         @Query("tags") tags: String? = null,
         @Query("limit") limit: Int? = null,
         @Query("page") page: Int? = null
-    ) : JsonElement //cant use List<PostItemDto> cus can be different result body
+    ): JsonElement //cant use List<PostItemDto> cus can be different result body
 
     //@GET("/books/v1/volumes/{googleId}")
     //	public Call<BookDetailsRespond> getBookDetails(@Path("googleId") String googleId,
