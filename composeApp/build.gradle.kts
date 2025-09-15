@@ -43,6 +43,7 @@ kotlin {
             implementation(libs.kotlinx.datetime)
             implementation(libs.room.runtime)
             implementation(libs.kstore)
+            implementation(libs.sqlite.bundled)
 
             implementation("de.jensklingenberg.ktorfit:ktorfit-lib:2.6.4")
             implementation("io.ktor:ktor-client-auth:3.2.3")

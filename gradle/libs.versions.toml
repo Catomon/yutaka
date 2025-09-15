@@ -18,6 +18,7 @@ room = "2.7.2"
 ksp = "2.2.0-2.0.2"
 kstore = "1.0.0"
 koinCore = "4.1.0"
+sqlite = "2.6.0"
 
 [libraries]
 
@@ -49,6 +50,7 @@ kstore = { module = "io.github.xxfast:kstore", version.ref = "kstore" }
 kstore-file = { module = "io.github.xxfast:kstore-file", version.ref = "kstore" }
 kstore-storage = { module = "io.github.xxfast:kstore-storage", version.ref = "kstore" }
 koin-core = { module = "io.insert-koin:koin-core", version.ref = "koinCore" }
+sqlite-bundled = { group = "androidx.sqlite", name = "sqlite-bundled", version.ref = "sqlite" }
 
 [plugins]
 

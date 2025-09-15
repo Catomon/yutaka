@@ -12,6 +12,7 @@ import io.github.catomon.yutaka.data.remote.DanbooruProvider
 import io.github.catomon.yutaka.data.remote.SafebooruApi
 import io.github.catomon.yutaka.data.remote.SafebooruProvider
 import io.github.catomon.yutaka.di.commonModule
+import io.github.catomon.yutaka.domain.PostRepository
 import io.github.catomon.yutaka.ui.MainScreen
 import io.github.catomon.yutaka.ui.theme.AppTheme
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -28,7 +29,7 @@ internal fun App() = AppTheme {
         modules(commonModule)
     }
 
-    val danbooru = get<DanbooruApi>(DanbooruApi::class.java) //todo
+//    val danbooru = get<DanbooruApi>(DanbooruApi::class.java)
     //val safebooru = get<SafebooruApi>(SafebooruApi::class.java)
 
     setSingletonImageLoaderFactory { context ->
@@ -39,6 +40,8 @@ internal fun App() = AppTheme {
             .build()
     }
 
-    MainScreen(DanbooruProvider(danbooru))
+    val postsRepo =  get<PostRepository>(PostRepository::class.java)
+
+    MainScreen(postsRepo)
     //MainScreen(SafebooruProvider(safebooru))
 }
