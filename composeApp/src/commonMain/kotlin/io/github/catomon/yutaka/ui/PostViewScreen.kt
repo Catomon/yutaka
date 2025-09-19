@@ -36,7 +36,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 
-val client = HttpClient()
+private val client = HttpClient()
 
 suspend fun downloadPost(post: Post): Boolean = withContext(Dispatchers.IO) {
     try {

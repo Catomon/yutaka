@@ -10,8 +10,11 @@ import kotlinx.serialization.json.jsonArray
 class SafebooruProvider(
     private val api: SafebooruApi
 ) : BooruProvider {
+
+    override val MAX_POSTS_LIMIT: Int = 1000
+
     override suspend fun getPosts(limit: Int, tags: String, page: Int): List<Post> {
-        val jsonArray = api.getPosts(limit = limit, tags = tags).jsonArray
+        val jsonArray = api.getPosts(limit = limit, tags = tags, pid = page).jsonArray
         val posts: MutableList<SafebooruPostDto> = mutableListOf()
         for (jsonElement in jsonArray) {
             try {

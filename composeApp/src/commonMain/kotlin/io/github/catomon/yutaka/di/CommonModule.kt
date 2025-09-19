@@ -22,8 +22,11 @@ import org.koin.dsl.module
 
 val commonModule = module {
     single<PostRepository> {
-        val danbooru = getOrNull<DanbooruApi>(DanbooruApi::class)?.let { DanbooruProvider(it) }
-        val booru = danbooru ?: getOrNull<SafebooruApi>(SafebooruApi::class)?.let { SafebooruProvider(it) } ?: throw IllegalStateException("No booru providers")
+        val useDanbooru = false //todo config and in-app settings option
+        val danbooru =
+            if (useDanbooru) getOrNull<DanbooruApi>(DanbooruApi::class)?.let { DanbooruProvider(it) } else null
+        val booru = danbooru ?: getOrNull<SafebooruApi>(SafebooruApi::class)?.let { SafebooruProvider(it) }
+        ?: throw IllegalStateException("No booru providers")
         PostRepositoryImpl(createPostDatabase(), booru)
     }
 

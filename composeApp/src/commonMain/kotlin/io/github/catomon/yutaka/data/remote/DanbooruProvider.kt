@@ -10,6 +10,9 @@ import kotlinx.serialization.json.jsonArray
 class DanbooruProvider(
     private val api: DanbooruApi
 ) : BooruProvider {
+
+    override val MAX_POSTS_LIMIT: Int = 200 //200 for posts.json, 1000 for everything else
+
     override suspend fun getPosts(limit: Int, tags: String, page: Int): List<Post> {
         val jsonArray = api.getPosts(limit = limit, tags = tags, page = page).jsonArray
         val posts: MutableList<DanbooruPostDto> = mutableListOf()

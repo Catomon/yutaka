@@ -55,7 +55,7 @@ fun PostsScreen(
                 Text("Next >")
             }
 
-            Text("page $page in $pages")
+            Text("page ${page + 1} in $pages")
         }
         if (posts.isEmpty())
             Text("Empty")

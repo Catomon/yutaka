@@ -20,7 +20,7 @@ import java.util.concurrent.CancellationException
 
 @Composable
 fun MainScreen(postRepo: PostRepository) {
-    var page by remember { mutableStateOf(1) }
+    var page by remember { mutableStateOf(0) }
     var posts by remember { mutableStateOf(emptyList<Post>()) }
     var tries by remember { mutableStateOf(0) }
     var status by remember { mutableStateOf("") }
