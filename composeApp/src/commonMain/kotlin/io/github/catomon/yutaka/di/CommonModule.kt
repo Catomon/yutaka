@@ -11,6 +11,7 @@ import io.github.catomon.yutaka.data.remote.createDanbooruApi
 import io.github.catomon.yutaka.data.remote.createSafebooruApi
 import io.github.catomon.yutaka.domain.PostRepository
 import io.github.catomon.yutaka.tokenBooru
+import io.github.catomon.yutaka.ui.viewmodel.MainViewModel
 import io.github.catomon.yutaka.usernameBooru
 import io.ktor.client.plugins.auth.Auth
 import io.ktor.client.plugins.auth.providers.BasicAuthCredentials
@@ -18,9 +19,12 @@ import io.ktor.client.plugins.auth.providers.basic
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
+import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
 val commonModule = module {
+    viewModel { MainViewModel(get()) }
+
     single<PostRepository> {
         val useDanbooru = false //todo config and in-app settings option
         val danbooru =

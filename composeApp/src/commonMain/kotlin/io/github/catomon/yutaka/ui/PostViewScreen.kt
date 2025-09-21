@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
@@ -15,8 +14,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onSizeChanged
@@ -64,12 +63,9 @@ suspend fun downloadPost(post: Post): Boolean = withContext(Dispatchers.IO) {
 }
 
 @Composable
-fun PostViewScreen(post: Post, backPressed: () -> Unit, modifier: Modifier = Modifier) {
+fun PostViewScreen(post: Post, onClose: () -> Unit, modifier: Modifier = Modifier) {
     var newSize by remember { mutableStateOf(IntSize(0, 0)) }
     var currentSize by remember { mutableStateOf(IntSize(0, 0)) }
-    var isDownloading by remember { mutableStateOf(false) }
-    var state by remember { mutableStateOf("") }
-//    val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(newSize) {
         if (currentSize.height < newSize.height || currentSize.width < newSize.width) {
@@ -82,28 +78,8 @@ fun PostViewScreen(post: Post, backPressed: () -> Unit, modifier: Modifier = Mod
         newSize = it
         if (currentSize.width == 0 && currentSize.height == 0)
             currentSize = it
-    }) {
-        Column(Modifier.matchParentSize().padding(bottom = 16.dp)) {
-            Row(Modifier.fillMaxWidth()) {
-                Button(backPressed) {
-                    Text("< Back")
-                }
-
-                Button(onClick = {
-                    CoroutineScope(Dispatchers.Main).launch {
-                        isDownloading = true
-                        state = ""
-                        val result = downloadPost(post)
-                        state = if (result) "Success." else "Fail."
-                        isDownloading = false
-                    }
-                }, enabled = !isDownloading) {
-                    Text("Download")
-                }
-
-                Text(state)
-            }
-
+    }, contentAlignment = Alignment.Center) {
+        Box(Modifier.matchParentSize().padding(bottom = 16.dp)) {
             key(currentSize) {
                 AsyncImage(
                     post.originalUri, "", Modifier.fillMaxSize(), contentScale = ContentScale.Fit
