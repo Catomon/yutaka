@@ -17,7 +17,9 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -26,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import io.github.catomon.yutaka.ui.local_providers.LocalWindowManager
+import io.github.catomon.yutaka.ui.util.LoadingStatus
 import io.github.catomon.yutaka.ui.viewmodel.MainViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -75,7 +78,6 @@ fun TopBar(
                     Icon(
                         painter = painterResource(Res.drawable.hide_window),
                         contentDescription = "Hide window",
-                        tint = MaterialTheme.colorScheme.onPrimary
                     )
                 }
                 IconButton(onClick = {
@@ -84,14 +86,12 @@ fun TopBar(
                     Icon(
                         painter = if (isMaximized) painterResource(Res.drawable.normal_window) else painterResource(Res.drawable.full_window),
                         contentDescription = "Toggle maximize",
-                        tint = MaterialTheme.colorScheme.onPrimary
                     )
                 }
                 IconButton(onClick = windowManager.closeWindow) {
                     Icon(
                         painter = painterResource(Res.drawable.close_window),
                         contentDescription = "Close window",
-                        tint = MaterialTheme.colorScheme.onPrimary
                     )
                 }
             }
@@ -127,19 +127,19 @@ fun TopBar(
 
                         Spacer(Modifier.Companion.weight(1f))
 
-                        AnimatedContent(viewModel.status) {
-                            when (viewModel.status) {
-                                MainViewModel.Companion.STATUS_LOADING -> CircularProgressIndicator()
-                                MainViewModel.Companion.STATUS_SUCCESS -> Text("OK", color = Color.Companion.Green)
-                                MainViewModel.Companion.STATUS_FAIL -> Text("OTD", color = Color.Companion.Red)
-                            }
-                        }
+                        LoadingStatusIndicator(viewModel.status)
                     }
                 }
 
                 else -> {
                     var isDownloading by remember { mutableStateOf(false) }
-                    var state by remember { mutableStateOf("") }
+                    var downloaded by remember { mutableStateOf(false) }
+                    var progress by remember { mutableIntStateOf(0) }
+
+                    LaunchedEffect(viewModel.viewPost) {
+                        val viewPost = viewModel.viewPost ?: return@LaunchedEffect
+                        downloaded = viewModel.isDownloaded(viewPost)
+                    }
 
                     Row(Modifier.fillMaxWidth()) {
                         Button(viewModel::closePost) {
@@ -150,19 +150,34 @@ fun TopBar(
                             CoroutineScope(Dispatchers.Main).launch {
                                 val post = viewModel.viewPost ?: return@launch
                                 isDownloading = true
-                                state = ""
-                                val result = downloadPost(post)
-                                state = if (result) "Success." else "Fail."
+                                downloaded = false
+                                val result = viewModel.downloadPost(post) {
+                                    progress = it
+                                }
+                                downloaded = result
                                 isDownloading = false
                             }
-                        }, enabled = !isDownloading) {
-                            Text("Download")
+                        }, enabled = !isDownloading && !downloaded) {
+                            Text(if (isDownloading) "$progress%" else if (downloaded) "Done :)" else "Download")
                         }
 
-                        Text(state)
+                        Spacer(Modifier.Companion.weight(1f))
+
+                        LoadingStatusIndicator(viewModel.viewPostStatus)
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun LoadingStatusIndicator(status: LoadingStatus) {
+    AnimatedContent(status) {
+        when (status) {
+            LoadingStatus.LOADING -> CircularProgressIndicator()
+            LoadingStatus.SUCCESS -> Text("OK", color = Color.Companion.Green)
+            LoadingStatus.FAIL -> Text("OTD", color = Color.Companion.Red)
         }
     }
 }

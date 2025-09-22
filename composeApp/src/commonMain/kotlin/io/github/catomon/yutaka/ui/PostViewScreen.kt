@@ -22,6 +22,7 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
+import coil3.compose.AsyncImagePainter
 import io.github.catomon.yutaka.domain.Post
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.timeout
@@ -35,35 +36,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 
-private val client = HttpClient()
-
-suspend fun downloadPost(post: Post): Boolean = withContext(Dispatchers.IO) {
-    try {
-        val response: HttpResponse = client.get(post.originalUri) {
-            timeout {
-                requestTimeoutMillis = 600000
-                socketTimeoutMillis = 120000
-            }
-        }
-        val bytes = response.readRawBytes()
-        val userHome = System.getProperty("user.home") ?: ""
-        val desktopPath = File(userHome, "Desktop")
-        val fileName = post.id + "." + post.fileExt
-        val file = File(desktopPath, fileName)
-        if (!file.exists())// {
-            file.writeBytes(bytes)
-            true
-//        } else {
-//            false
-//        }
-    } catch (e: Exception) {
-        e.printStackTrace()
-        false
-    }
-}
-
 @Composable
-fun PostViewScreen(post: Post, onClose: () -> Unit, modifier: Modifier = Modifier) {
+fun PostViewScreen(post: Post, onLoadState: (AsyncImagePainter.State) -> Unit, modifier: Modifier = Modifier) {
     var newSize by remember { mutableStateOf(IntSize(0, 0)) }
     var currentSize by remember { mutableStateOf(IntSize(0, 0)) }
 
@@ -82,7 +56,8 @@ fun PostViewScreen(post: Post, onClose: () -> Unit, modifier: Modifier = Modifie
         Box(Modifier.matchParentSize().padding(bottom = 16.dp)) {
             key(currentSize) {
                 AsyncImage(
-                    post.originalUri, "", Modifier.fillMaxSize(), contentScale = ContentScale.Fit
+                    post.originalUri, "", Modifier.fillMaxSize(), contentScale = ContentScale.Fit,
+                    onState = onLoadState
                 )
             }
         }

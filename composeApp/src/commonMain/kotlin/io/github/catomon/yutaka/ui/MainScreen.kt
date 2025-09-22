@@ -17,7 +17,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import coil3.compose.AsyncImagePainter
 import io.github.catomon.yutaka.domain.Post
+import io.github.catomon.yutaka.ui.util.LoadingStatus
 import io.github.catomon.yutaka.ui.viewmodel.MainViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -47,7 +49,16 @@ fun MainScreen(viewModel: MainViewModel = koinViewModel<MainViewModel>(), modifi
                 post?.let {
                     PostViewScreen(
                         it,
-                        onClose = { viewModel.closePost() },
+                        onLoadState = {
+                            viewModel.onPostViewLoadStatus(
+                                when (it) {
+                                    AsyncImagePainter.State.Empty -> LoadingStatus.LOADING
+                                    is AsyncImagePainter.State.Error -> LoadingStatus.FAIL
+                                    is AsyncImagePainter.State.Loading -> LoadingStatus.LOADING
+                                    is AsyncImagePainter.State.Success -> LoadingStatus.SUCCESS
+                                }
+                            )
+                        },
                         modifier = Modifier.fillMaxSize().background(Color.Black)
                     )
                 }
