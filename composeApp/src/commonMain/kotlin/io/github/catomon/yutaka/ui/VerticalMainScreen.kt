@@ -25,12 +25,12 @@ import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen(viewModel: MainViewModel = koinViewModel<MainViewModel>(), modifier: Modifier = Modifier) {
+fun VerticalMainScreen(viewModel: MainViewModel = koinViewModel<MainViewModel>(), modifier: Modifier = Modifier) {
     val viewPost = viewModel.viewPost
 
     Box(modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
         Box(
-            Modifier.matchParentSize().padding(top = TopBarDefaults.HEIGHT.dp),
+            Modifier.matchParentSize().padding(bottom = TopBarDefaults.HEIGHT.dp),
             contentAlignment = Alignment.Center
         ) {
             Posts(
@@ -65,8 +65,8 @@ fun MainScreen(viewModel: MainViewModel = koinViewModel<MainViewModel>(), modifi
             }
         }
 
-        TopBar(viewModel, {
+        ActionBar(viewModel, {
             //todo
-        })
+        }, modifier = Modifier.align(Alignment.BottomCenter))
     }
 }

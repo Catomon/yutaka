@@ -1,10 +1,12 @@
 import androidx.compose.ui.window.application
+import io.github.catomon.yutaka.di.commonModule
 import io.github.catomon.yutaka.ui.MainWindow
 import io.github.catomon.yutaka.ui.WindowConfig
 import io.github.catomon.yutaka.ui.util.setComposeExceptionHandler
 import io.github.catomon.yutaka.util.echoMsg
 import io.github.catomon.yutaka.util.echoWarn
 import org.jetbrains.skiko.GraphicsApi
+import org.koin.core.context.startKoin
 import javax.swing.JOptionPane
 
 fun main() {
@@ -14,6 +16,10 @@ fun main() {
         setComposeExceptionHandler()
 
         setRenderApi()
+
+        startKoin {
+            modules(commonModule)
+        }
 
         MainWindow(::exitApplication)
     }
