@@ -14,8 +14,7 @@ import io.ktor.client.plugins.onDownload
 import io.ktor.client.plugins.timeout
 import io.ktor.client.request.prepareGet
 import io.ktor.client.statement.HttpStatement
-import io.ktor.client.statement.bodyAsChannel
-import io.ktor.utils.io.jvm.javaio.toInputStream
+import io.ktor.client.statement.readRawBytes
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.last
@@ -29,10 +28,6 @@ class MainViewModel(private val postRepo: PostRepository) : ViewModel() {
     companion object {
         private const val MIN_SCORE = 0
         private const val PAGE_LIMIT = 40
-
-        const val STATUS_SUCCESS = 0
-        const val STATUS_FAIL = 1
-        const val STATUS_LOADING = 2
     }
 
     var page by mutableStateOf(0)
@@ -118,7 +113,7 @@ class MainViewModel(private val postRepo: PostRepository) : ViewModel() {
 
     fun isDownloaded(post: Post) = post.toFile().exists()
 
-    fun Post.toFile() : File {
+    fun Post.toFile(): File {
         val userHome = System.getProperty("user.home") ?: ""
         val desktopPath = File(userHome, "Desktop")
         val fileName = "$host$id.$fileExt"
@@ -127,6 +122,7 @@ class MainViewModel(private val postRepo: PostRepository) : ViewModel() {
     }
 
     suspend fun downloadPost(post: Post, progress: (Int) -> Unit): Boolean = withContext(Dispatchers.IO) {
+        if (isDownloaded(post)) return@withContext true
         try {
             var lastProgress = 0
             val response: HttpStatement = client.prepareGet(post.originalUri) {
@@ -134,7 +130,6 @@ class MainViewModel(private val postRepo: PostRepository) : ViewModel() {
                     requestTimeoutMillis = 600000
                     socketTimeoutMillis = 120000
                 }
-
                 onDownload { bytesDownloaded, contentLength ->
                     val progress = (bytesDownloaded.toFloat() / (contentLength ?: return@onDownload) * 100).toInt()
                     if (progress > lastProgress) {
@@ -144,13 +139,9 @@ class MainViewModel(private val postRepo: PostRepository) : ViewModel() {
                 }
             }
             val file = post.toFile()
-            if (!isDownloaded(post))
-                file.outputStream().use { outStream ->
-                    response.execute { httpResponse ->
-                        val channel = httpResponse.bodyAsChannel()
-                        channel.toInputStream().copyTo(outStream)
-                    }
-                }
+            response.execute { httpResponse ->
+                file.writeBytes(httpResponse.readRawBytes())
+            }
             true
         } catch (e: Exception) {
             e.printStackTrace()

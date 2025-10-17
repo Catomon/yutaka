@@ -73,7 +73,7 @@ fun TopBar(
 
             Row {
                 IconButton(onClick = {
-                    windowManager.minimize
+                    windowManager.minimize()
                 }) {
                     Icon(
                         painter = painterResource(Res.drawable.hide_window),
