@@ -4,6 +4,6 @@ import io.github.catomon.yutaka.data.local.platform.ImageSaverImpl
 import io.github.catomon.yutaka.domain.ImageSaver
 import org.koin.dsl.module
 
-val androidModule = module {
-    single<ImageSaver> { ImageSaverImpl(get()) }
+val desktopModule = module {
+    single<ImageSaver> { ImageSaverImpl() }
 }

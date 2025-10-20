@@ -2,6 +2,7 @@ package io.github.catomon.yutaka.di
 
 import de.jensklingenberg.ktorfit.Ktorfit
 import io.github.catomon.yutaka.data.PostRepositoryImpl
+import io.github.catomon.yutaka.data.local.ImageDownloaderImpl
 import io.github.catomon.yutaka.data.local.platform.createPostDatabase
 import io.github.catomon.yutaka.data.remote.DanbooruApi
 import io.github.catomon.yutaka.data.remote.DanbooruProvider
@@ -9,6 +10,7 @@ import io.github.catomon.yutaka.data.remote.SafebooruApi
 import io.github.catomon.yutaka.data.remote.SafebooruProvider
 import io.github.catomon.yutaka.data.remote.createDanbooruApi
 import io.github.catomon.yutaka.data.remote.createSafebooruApi
+import io.github.catomon.yutaka.domain.ImageDownloader
 import io.github.catomon.yutaka.domain.PostRepository
 import io.github.catomon.yutaka.tokenBooru
 import io.github.catomon.yutaka.ui.viewmodel.MainViewModel
@@ -23,7 +25,9 @@ import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
 val commonModule = module {
-    viewModel { MainViewModel(get()) }
+    viewModel { MainViewModel(get(), get()) }
+
+    single<ImageDownloader> { ImageDownloaderImpl(get()) }
 
     single<PostRepository> {
         val useDanbooru = false //todo config and in-app settings option

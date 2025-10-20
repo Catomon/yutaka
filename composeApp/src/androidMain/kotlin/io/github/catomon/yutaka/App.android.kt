@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.core.view.WindowInsetsControllerCompat
 import io.github.catomon.yutaka.ui.local_providers.LocalWindowManager
 import io.github.catomon.yutaka.ui.util.DesktopWindowManager
 

@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -42,7 +41,7 @@ import yutaka.composeapp.generated.resources.full_window
 import yutaka.composeapp.generated.resources.hide_window
 import yutaka.composeapp.generated.resources.normal_window
 
-object TopBarDefaults {
+object ActionBarDefaults {
     const val HEIGHT = 80
 }
 
@@ -52,7 +51,7 @@ fun ActionBar(
     onOpenMenu: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Column(modifier.fillMaxWidth().height(TopBarDefaults.HEIGHT.dp).background(color = MaterialTheme.colorScheme.surface)) {
+    Column(modifier.fillMaxWidth().height(ActionBarDefaults.HEIGHT.dp).background(color = MaterialTheme.colorScheme.surface)) {
         Row(
             Modifier
                 .fillMaxWidth()
@@ -153,7 +152,7 @@ fun DesktopActionBar(
     var isMaximized by remember { mutableStateOf(false) }
     val windowManager = LocalWindowManager.current
 
-    Column(modifier.fillMaxWidth().height(TopBarDefaults.HEIGHT.dp).background(color = MaterialTheme.colorScheme.surface)) {
+    Column(modifier.fillMaxWidth().height(ActionBarDefaults.HEIGHT.dp).background(color = MaterialTheme.colorScheme.surface)) {
         Row(
             Modifier
                 .fillMaxWidth()

@@ -1,5 +1,6 @@
 import androidx.compose.ui.window.application
 import io.github.catomon.yutaka.di.commonModule
+import io.github.catomon.yutaka.di.desktopModule
 import io.github.catomon.yutaka.ui.MainWindow
 import io.github.catomon.yutaka.ui.WindowConfig
 import io.github.catomon.yutaka.ui.util.setComposeExceptionHandler
@@ -18,7 +19,7 @@ fun main() {
         setRenderApi()
 
         startKoin {
-            modules(commonModule)
+            modules(commonModule, desktopModule)
         }
 
         MainWindow(::exitApplication)

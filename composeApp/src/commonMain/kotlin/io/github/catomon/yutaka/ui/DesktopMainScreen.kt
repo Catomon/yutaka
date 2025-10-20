@@ -30,7 +30,7 @@ fun DesktopMainScreen(viewModel: MainViewModel = koinViewModel<MainViewModel>(),
 
     Box(modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
         Box(
-            Modifier.matchParentSize().padding(top = TopBarDefaults.HEIGHT.dp),
+            Modifier.matchParentSize().padding(top = ActionBarDefaults.HEIGHT.dp),
             contentAlignment = Alignment.Center
         ) {
             Posts(

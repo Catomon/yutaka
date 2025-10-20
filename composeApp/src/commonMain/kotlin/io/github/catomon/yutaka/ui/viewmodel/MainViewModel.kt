@@ -5,6 +5,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import io.github.catomon.yutaka.domain.ImageDownloader
+import io.github.catomon.yutaka.domain.ImageSaver
 import io.github.catomon.yutaka.domain.Post
 import io.github.catomon.yutaka.domain.PostRepository
 import io.github.catomon.yutaka.ui.util.LoadingStatus
@@ -20,11 +22,10 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.io.File
 import java.net.SocketException
 import kotlin.coroutines.cancellation.CancellationException
 
-class MainViewModel(private val postRepo: PostRepository) : ViewModel() {
+class MainViewModel(private val postRepo: PostRepository, private val imageDownloader: ImageDownloader) : ViewModel() {
     companion object {
         private const val MIN_SCORE = 0
         private const val PAGE_LIMIT = 40
@@ -102,52 +103,16 @@ class MainViewModel(private val postRepo: PostRepository) : ViewModel() {
         viewPost = null
     }
 
-    /** From 0 to whatever */
+    /** From 0 to <>< */
     fun changePage(newPage: Int) {
         if (newPage == page || newPage < 0) return
         page = newPage
         refresh()
     }
 
-    private val client = HttpClient()
+    fun isDownloaded(post: Post) = imageDownloader.isDownloaded(post)
 
-    fun isDownloaded(post: Post) = post.toFile().exists()
-
-    fun Post.toFile(): File {
-        val userHome = System.getProperty("user.home") ?: ""
-        val desktopPath = File(userHome, "Desktop")
-        val fileName = "$host$id.$fileExt"
-        val file = File(desktopPath, fileName)
-        return file
-    }
-
-    suspend fun downloadPost(post: Post, progress: (Int) -> Unit): Boolean = withContext(Dispatchers.IO) {
-        if (isDownloaded(post)) return@withContext true
-        try {
-            var lastProgress = 0
-            val response: HttpStatement = client.prepareGet(post.originalUri) {
-                timeout {
-                    requestTimeoutMillis = 600000
-                    socketTimeoutMillis = 120000
-                }
-                onDownload { bytesDownloaded, contentLength ->
-                    val progress = (bytesDownloaded.toFloat() / (contentLength ?: return@onDownload) * 100).toInt()
-                    if (progress > lastProgress) {
-                        progress(progress)
-                        lastProgress = progress
-                    }
-                }
-            }
-            val file = post.toFile()
-            response.execute { httpResponse ->
-                file.writeBytes(httpResponse.readRawBytes())
-            }
-            true
-        } catch (e: Exception) {
-            e.printStackTrace()
-            false
-        }
-    }
+    suspend fun downloadPost(post: Post, progress: (Int) -> Unit): Boolean = imageDownloader.downloadPost(post, progress)
 
     fun onPostViewLoadStatus(status: LoadingStatus) {
         viewPostStatus = status
