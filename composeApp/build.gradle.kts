@@ -120,6 +120,14 @@ compose.desktop {
                 iconFile.set(project.file("desktopAppIcons/MacosIcon.icns"))
                 bundleID = "io.github.catomon.yutaka.desktopApp"
             }
+
+            //todo
+            buildTypes.release.proguard {
+                configurationFiles.from(project.file("compose-desktop.pro"))
+                isEnabled = false
+                optimize = true
+                obfuscate = false
+            }
         }
     }
 }

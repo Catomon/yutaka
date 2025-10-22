@@ -16,6 +16,9 @@ import io.github.catomon.yutaka.ui.local_providers.LocalWindowManager
 import io.github.catomon.yutaka.ui.modifiers.luckyWindowDecoration
 import io.github.catomon.yutaka.ui.util.DesktopWindowManager
 import io.github.catomon.yutaka.ui.util.WindowDraggableArea
+import org.jetbrains.compose.resources.painterResource
+import yutaka.composeapp.generated.resources.Res
+import yutaka.composeapp.generated.resources.icon
 import java.awt.Dimension
 
 object WindowConfig {
@@ -38,7 +41,8 @@ fun MainWindow(exitApplication: () -> Unit) {
             state = windowState,
             onCloseRequest = exitApplication,
             undecorated = true,
-            transparent = WindowConfig.isTransparent
+            transparent = WindowConfig.isTransparent,
+            icon = painterResource(Res.drawable.icon)
         ) {
             window.minimumSize = Dimension(350, 600)
 
