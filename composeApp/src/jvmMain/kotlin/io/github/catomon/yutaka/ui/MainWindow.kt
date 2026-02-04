@@ -56,8 +56,10 @@ fun MainWindow(exitApplication: () -> Unit) {
                         windowState.placement = WindowPlacement.Floating
                         false
                     } else {
-                        windowState.placement = WindowPlacement.Maximized
-                        true
+                        if (windowState.placement != WindowPlacement.Maximized) {
+                            windowState.placement = WindowPlacement.Maximized
+                            true
+                        } else false
                     }
                 },
                 closeWindow = exitApplication
