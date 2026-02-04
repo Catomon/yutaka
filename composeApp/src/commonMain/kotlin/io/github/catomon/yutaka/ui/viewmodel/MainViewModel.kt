@@ -1,27 +1,19 @@
 package io.github.catomon.yutaka.ui.viewmodel
 
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.github.catomon.yutaka.domain.ImageDownloader
-import io.github.catomon.yutaka.domain.ImageSaver
 import io.github.catomon.yutaka.domain.Post
 import io.github.catomon.yutaka.domain.PostRepository
 import io.github.catomon.yutaka.ui.util.LoadingStatus
-import io.ktor.client.HttpClient
 import io.ktor.client.plugins.HttpRequestTimeoutException
-import io.ktor.client.plugins.onDownload
-import io.ktor.client.plugins.timeout
-import io.ktor.client.request.prepareGet
-import io.ktor.client.statement.HttpStatement
-import io.ktor.client.statement.readRawBytes
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.net.SocketException
 import kotlin.coroutines.cancellation.CancellationException
 
@@ -31,7 +23,7 @@ class MainViewModel(private val postRepo: PostRepository, private val imageDownl
         private const val PAGE_LIMIT = 40
     }
 
-    var page by mutableStateOf(0)
+    var page by mutableIntStateOf(0)
         private set
 
     var posts by mutableStateOf<List<Post>>(emptyList())
@@ -110,9 +102,44 @@ class MainViewModel(private val postRepo: PostRepository, private val imageDownl
         refresh()
     }
 
+    fun nextPost() {
+        viewPost?.let { curPost ->
+            var index = posts.indexOf(curPost)
+            if (index != -1) {
+                index++
+                if (index >= posts.size) {
+                    changePage(page + 1)
+                    loadingJob?.invokeOnCompletion {
+                        openPost(posts.firstOrNull() ?: return@invokeOnCompletion)
+                    }
+                } else {
+                    openPost(posts.getOrNull(index) ?: return)
+                }
+            }
+        }
+    }
+
+    fun prevPost() {
+        viewPost?.let { curPost ->
+            var index = posts.indexOf(curPost)
+            if (index != -1) {
+                index--
+                if (index < 0) {
+                    changePage(page - 1)
+                    loadingJob?.invokeOnCompletion {
+                        openPost(posts.lastOrNull() ?: return@invokeOnCompletion)
+                    }
+                } else {
+                    openPost(posts.getOrNull(index) ?: return)
+                }
+            }
+        }
+    }
+
     fun isDownloaded(post: Post) = imageDownloader.isDownloaded(post)
 
-    suspend fun downloadPost(post: Post, progress: (Int) -> Unit): Boolean = imageDownloader.downloadPost(post, progress)
+    suspend fun downloadPost(post: Post, progress: (Int) -> Unit): Boolean =
+        imageDownloader.downloadPost(post, progress)
 
     fun onPostViewLoadStatus(status: LoadingStatus) {
         viewPostStatus = status

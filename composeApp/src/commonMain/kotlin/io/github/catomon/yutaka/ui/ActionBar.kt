@@ -260,6 +260,14 @@ fun DesktopActionBar(
                             Text(if (isDownloading) "$progress%" else if (downloaded) "Done :)" else "Download")
                         }
 
+                        Button(viewModel::prevPost) {
+                            Text("<Prev")
+                        }
+
+                        Button(viewModel::nextPost) {
+                            Text("Next>")
+                        }
+
                         Spacer(Modifier.Companion.weight(1f))
 
                         LoadingStatusIndicator(viewModel.viewPostStatus)
