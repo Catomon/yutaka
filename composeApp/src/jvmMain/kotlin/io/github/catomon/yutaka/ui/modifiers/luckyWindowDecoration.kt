@@ -13,8 +13,8 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
-import io.github.catomon.yutaka.ui.WindowConfig
 import io.github.catomon.yutaka.ui.util.darken
+import io.github.catomon.yutaka.ui.viewmodel.WindowConfig
 
 @Composable
 fun Modifier.luckyWindowDecoration(): Modifier {

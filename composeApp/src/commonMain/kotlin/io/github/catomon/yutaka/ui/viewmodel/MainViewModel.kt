@@ -4,6 +4,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.WindowPlacement
+import androidx.compose.ui.window.WindowState
+import androidx.compose.ui.window.rememberWindowState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.github.catomon.yutaka.domain.ImageDownloader
@@ -11,11 +15,22 @@ import io.github.catomon.yutaka.domain.Post
 import io.github.catomon.yutaka.domain.PostRepository
 import io.github.catomon.yutaka.ui.util.LoadingStatus
 import io.ktor.client.plugins.HttpRequestTimeoutException
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.launch
 import java.net.SocketException
 import kotlin.coroutines.cancellation.CancellationException
+
+object WindowConfig {
+    const val WIDTH = 800
+    const val HEIGHT = 600
+
+    var isTransparent = true
+
+    val isTraySupported = androidx.compose.ui.window.isTraySupported
+}
 
 class MainViewModel(private val postRepo: PostRepository, private val imageDownloader: ImageDownloader) : ViewModel() {
     companion object {
@@ -40,6 +55,15 @@ class MainViewModel(private val postRepo: PostRepository, private val imageDownl
 
     var isLoading by mutableStateOf(true)
         private set
+
+    var isDownloading by mutableStateOf(false)
+        private set
+    var downloaded by mutableStateOf(false)
+        private set
+    var progress by mutableIntStateOf(0)
+        private set
+
+    val windowState = WindowState(width = WindowConfig.WIDTH.dp, height = WindowConfig.HEIGHT.dp)
 
     init {
         loadLocalPosts()
@@ -89,6 +113,7 @@ class MainViewModel(private val postRepo: PostRepository, private val imageDownl
 
     fun openPost(post: Post) {
         viewPost = post
+        downloaded = isDownloaded(post)
     }
 
     fun closePost() {
@@ -138,8 +163,19 @@ class MainViewModel(private val postRepo: PostRepository, private val imageDownl
 
     fun isDownloaded(post: Post) = imageDownloader.isDownloaded(post)
 
-    suspend fun downloadPost(post: Post, progress: (Int) -> Unit): Boolean =
-        imageDownloader.downloadPost(post, progress)
+    fun downloadViewedPost() {
+        CoroutineScope(Dispatchers.Main).launch {
+            val post = viewPost ?: return@launch
+            isDownloading = true
+            downloaded = false
+            val result = imageDownloader.downloadPost(post) {
+                progress = it
+            }
+            downloaded = result
+            isDownloading = false
+        }
+    }
+
 
     fun onPostViewLoadStatus(status: LoadingStatus) {
         viewPostStatus = status

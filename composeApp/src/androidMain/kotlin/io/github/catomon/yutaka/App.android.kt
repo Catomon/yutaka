@@ -19,7 +19,7 @@ class AppActivity : ComponentActivity() {
                     false
                 },
                 maximize = {
-               true
+                    true
                 },
                 closeWindow = {
 

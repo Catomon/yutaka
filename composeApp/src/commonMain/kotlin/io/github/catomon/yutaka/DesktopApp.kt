@@ -11,10 +11,12 @@ import coil3.size.Precision
 import coil3.size.Size
 import io.github.catomon.yutaka.ui.DesktopMainScreen
 import io.github.catomon.yutaka.ui.theme.AppTheme
+import io.github.catomon.yutaka.ui.viewmodel.MainViewModel
+import org.koin.compose.viewmodel.koinViewModel
 
 @Preview
 @Composable
-internal fun DesktopApp(modifier: Modifier = Modifier) = AppTheme(modifier = modifier) {
+internal fun DesktopApp(viewModel: MainViewModel = koinViewModel<MainViewModel>(), modifier: Modifier = Modifier) = AppTheme(modifier = modifier) {
     //WindowInsets.safeDrawing
     // .windowInsetsPadding()
 
@@ -26,5 +28,5 @@ internal fun DesktopApp(modifier: Modifier = Modifier) = AppTheme(modifier = mod
             .build()
     }
 
-    DesktopMainScreen()
+    DesktopMainScreen(viewModel)
 }

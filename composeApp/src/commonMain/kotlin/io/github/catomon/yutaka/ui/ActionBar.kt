@@ -17,9 +17,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -31,9 +29,6 @@ import androidx.compose.ui.unit.dp
 import io.github.catomon.yutaka.ui.local_providers.LocalWindowManager
 import io.github.catomon.yutaka.ui.util.LoadingStatus
 import io.github.catomon.yutaka.ui.viewmodel.MainViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 import yutaka.composeapp.generated.resources.Res
 import yutaka.composeapp.generated.resources.close_window
@@ -51,7 +46,10 @@ fun ActionBar(
     onOpenMenu: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Column(modifier.fillMaxWidth().height(ActionBarDefaults.HEIGHT.dp).background(color = MaterialTheme.colorScheme.surface)) {
+    Column(
+        modifier.fillMaxWidth().height(ActionBarDefaults.HEIGHT.dp)
+            .background(color = MaterialTheme.colorScheme.surface)
+    ) {
         Row(
             Modifier
                 .fillMaxWidth()
@@ -104,14 +102,9 @@ fun ActionBar(
                 }
 
                 else -> {
-                    var isDownloading by remember { mutableStateOf(false) }
-                    var downloaded by remember { mutableStateOf(false) }
-                    var progress by remember { mutableIntStateOf(0) }
-
-                    LaunchedEffect(viewModel.viewPost) {
-                        val viewPost = viewModel.viewPost ?: return@LaunchedEffect
-                        downloaded = viewModel.isDownloaded(viewPost)
-                    }
+                    val isDownloading = viewModel.isDownloading
+                    val downloaded = viewModel.downloaded
+                    val progress = viewModel.progress
 
                     Row(Modifier.fillMaxWidth()) {
                         Button(viewModel::closePost) {
@@ -119,16 +112,7 @@ fun ActionBar(
                         }
 
                         Button(onClick = {
-                            CoroutineScope(Dispatchers.Main).launch {
-                                val post = viewModel.viewPost ?: return@launch
-                                isDownloading = true
-                                downloaded = false
-                                val result = viewModel.downloadPost(post) {
-                                    progress = it
-                                }
-                                downloaded = result
-                                isDownloading = false
-                            }
+                            viewModel.downloadViewedPost()
                         }, enabled = !isDownloading && !downloaded) {
                             Text(if (isDownloading) "$progress%" else if (downloaded) "Done :)" else "Download")
                         }
@@ -152,7 +136,10 @@ fun DesktopActionBar(
     var isMaximized by remember { mutableStateOf(false) }
     val windowManager = LocalWindowManager.current
 
-    Column(modifier.fillMaxWidth().height(ActionBarDefaults.HEIGHT.dp).background(color = MaterialTheme.colorScheme.surface)) {
+    Column(
+        modifier.fillMaxWidth().height(ActionBarDefaults.HEIGHT.dp)
+            .background(color = MaterialTheme.colorScheme.surface)
+    ) {
         Row(
             Modifier
                 .fillMaxWidth()
@@ -190,7 +177,7 @@ fun DesktopActionBar(
                 IconButton(onClick = windowManager.closeWindow) {
                     Icon(
                         painter = painterResource(Res.drawable.close_window),
-                        contentDescription = "Close window",
+                        contentDescription = "Exit App",
                     )
                 }
             }
@@ -199,7 +186,7 @@ fun DesktopActionBar(
         AnimatedContent(viewModel.viewPost, modifier.fillMaxWidth().height(48.dp)) {
             when (it) {
                 null -> {
-                    Row(verticalAlignment = Alignment.Companion.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+                    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
                         Button(viewModel::refresh, enabled = !viewModel.isLoading) {
                             Text("Refresh")
                         }
@@ -231,14 +218,9 @@ fun DesktopActionBar(
                 }
 
                 else -> {
-                    var isDownloading by remember { mutableStateOf(false) }
-                    var downloaded by remember { mutableStateOf(false) }
-                    var progress by remember { mutableIntStateOf(0) }
-
-                    LaunchedEffect(viewModel.viewPost) {
-                        val viewPost = viewModel.viewPost ?: return@LaunchedEffect
-                        downloaded = viewModel.isDownloaded(viewPost)
-                    }
+                    val isDownloading = viewModel.isDownloading
+                    val downloaded = viewModel.downloaded
+                    val progress = viewModel.progress
 
                     Row(Modifier.fillMaxWidth()) {
                         Button(viewModel::closePost) {
@@ -246,16 +228,7 @@ fun DesktopActionBar(
                         }
 
                         Button(onClick = {
-                            CoroutineScope(Dispatchers.Main).launch {
-                                val post = viewModel.viewPost ?: return@launch
-                                isDownloading = true
-                                downloaded = false
-                                val result = viewModel.downloadPost(post) {
-                                    progress = it
-                                }
-                                downloaded = result
-                                isDownloading = false
-                            }
+                            viewModel.downloadViewedPost()
                         }, enabled = !isDownloading && !downloaded) {
                             Text(if (isDownloading) "$progress%" else if (downloaded) "Done :)" else "Download")
                         }
@@ -268,7 +241,7 @@ fun DesktopActionBar(
                             Text("Next>")
                         }
 
-                        Spacer(Modifier.Companion.weight(1f))
+                        Spacer(Modifier.weight(1f))
 
                         LoadingStatusIndicator(viewModel.viewPostStatus)
                     }
@@ -280,7 +253,7 @@ fun DesktopActionBar(
 
 @Composable
 private fun LoadingStatusIndicator(status: LoadingStatus) {
-    AnimatedContent(status) {
+    AnimatedContent(status) { status ->
         when (status) {
             LoadingStatus.LOADING -> CircularProgressIndicator()
             LoadingStatus.SUCCESS -> Text("OK", color = Color.Companion.Green)
