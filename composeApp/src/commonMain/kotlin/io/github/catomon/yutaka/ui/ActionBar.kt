@@ -138,7 +138,6 @@ fun DesktopActionBar(
 
     Column(
         modifier.fillMaxWidth().height(ActionBarDefaults.HEIGHT.dp)
-            .background(color = MaterialTheme.colorScheme.surface)
     ) {
         Row(
             Modifier
