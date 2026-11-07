@@ -30,7 +30,6 @@ fun YutakaMenuOverlay(
     onOpenDownloads: () -> Unit,
     onOpenSafebooru: () -> Unit,
     onOpenGitHub: () -> Unit,
-    onOpenDiscord: () -> Unit,
     onExit: () -> Unit,
     onClose: () -> Unit,
     modifier: Modifier = Modifier,
@@ -72,10 +71,6 @@ fun YutakaMenuOverlay(
             }
             YutakaMenuEntry("GitHub") {
                 onOpenGitHub()
-                onClose()
-            }
-            YutakaMenuEntry("Discord") {
-                onOpenDiscord()
                 onClose()
             }
             YutakaMenuEntry("Exit app") {

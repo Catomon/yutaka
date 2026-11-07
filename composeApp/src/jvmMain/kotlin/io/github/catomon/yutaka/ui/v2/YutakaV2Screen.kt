@@ -203,7 +203,6 @@ fun YutakaV2Screen(
                 onOpenDownloads = { openDownloadsFolder() },
                 onOpenSafebooru = { uriHandler.openUri("https://safebooru.org/") },
                 onOpenGitHub = { uriHandler.openUri("https://github.com/Catomon") },
-                onOpenDiscord = { uriHandler.openUri("https://discord.gg/K9pxRcaKK5") },
                 onExit = { windowManager.closeWindow() },
                 onClose = { isMenuOpen = false },
             )
