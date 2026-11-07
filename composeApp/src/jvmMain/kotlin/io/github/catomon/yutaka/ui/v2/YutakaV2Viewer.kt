@@ -246,15 +246,6 @@ fun YutakaViewer(
                     background = colors.headerEnd.copy(alpha = 0.9f),
                     content = colors.headerContent,
                 )
-
-                YutakaBadge(
-                    text = "double click to zoom",
-                    modifier = Modifier
-                        .align(Alignment.BottomStart)
-                        .padding(12.dp),
-                    background = colors.headerEnd.copy(alpha = 0.9f),
-                    content = colors.headerContent,
-                )
             }
 
             ViewerTagBar(post = post, onTagClick = viewModel::applyTags, onClose = onClose)
