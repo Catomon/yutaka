@@ -8,10 +8,8 @@ import java.io.File
 class ImageSaverImpl : ImageSaver {
     override suspend fun saveImage(bytes: ByteArray, fileName: String, fileExt: String): Boolean = withContext(Dispatchers.IO) {
         try {
-            val userHome = System.getProperty("user.home") ?: return@withContext false
-            val desktop = File(userHome, "Desktop")
-            if (!desktop.exists()) desktop.mkdirs()
-            val file = File(desktop, "$fileName.$fileExt")
+            val folder = ensureYutakaDownloadsFolder()
+            val file = File(folder, "$fileName.$fileExt")
 
             file.writeBytes(bytes)
             true
@@ -22,8 +20,6 @@ class ImageSaverImpl : ImageSaver {
     }
 
     override fun isDownloaded(fileName: String): Boolean {
-        val userHome = System.getProperty("user.home") ?: return false
-        val desktop = File(userHome, "Desktop")
-        return File(desktop, fileName).exists()
+        return File(yutakaDownloadsFolder, fileName).exists()
     }
 }

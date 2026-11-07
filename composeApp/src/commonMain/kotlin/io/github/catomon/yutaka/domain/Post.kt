@@ -1,5 +1,8 @@
 package io.github.catomon.yutaka.domain
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class Post(
     val id: String,
     val host: String,

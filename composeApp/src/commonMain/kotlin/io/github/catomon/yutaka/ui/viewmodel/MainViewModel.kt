@@ -41,6 +41,9 @@ class MainViewModel(private val postRepo: PostRepository, private val imageDownl
     var page by mutableIntStateOf(0)
         private set
 
+    var tags by mutableStateOf("lucky_star")
+        private set
+
     var posts by mutableStateOf<List<Post>>(emptyList())
         private set
 
@@ -79,16 +82,17 @@ class MainViewModel(private val postRepo: PostRepository, private val imageDownl
     }
 
     private var loadingJob: Job? = null
-    private fun loadRemotePosts() {
+    private fun loadRemotePosts(append: Boolean = false) {
         loadingJob?.cancel()
 
         loadingJob = viewModelScope.launch {
             try {
                 status = LoadingStatus.LOADING
                 isLoading = true
-                val remotePosts = postRepo.getRemotePosts(tags = "lucky_star", limit = PAGE_LIMIT, page = page)
-                posts = remotePosts.filter { it.score >= MIN_SCORE }
-                postRepo.updateLocalPosts(remotePosts)
+                val remotePosts = postRepo.getRemotePosts(tags = tags, limit = PAGE_LIMIT, page = page)
+                val filtered = remotePosts.filter { it.score >= MIN_SCORE }
+                posts = if (append) (posts + filtered).distinctBy { it.id } else filtered
+                postRepo.updateLocalPosts(if (append) posts else remotePosts)
                 status = LoadingStatus.SUCCESS
             } catch (e: HttpRequestTimeoutException) {
                 status = LoadingStatus.FAIL
@@ -108,6 +112,26 @@ class MainViewModel(private val postRepo: PostRepository, private val imageDownl
     }
 
     fun refresh() {
+        loadRemotePosts()
+    }
+
+    /** Reloads the gallery from the first page, keeping the current tags. */
+    fun reload() {
+        page = 0
+        loadRemotePosts()
+    }
+
+    /** Appends the next remote page; used by the endless gallery scroll. */
+    fun loadMore() {
+        if (isLoading) return
+        page += 1
+        loadRemotePosts(append = true)
+    }
+
+    fun applyTags(newTags: String) {
+        val clean = newTags.trim()
+        tags = clean.ifEmpty { "lucky_star" }
+        page = 0
         loadRemotePosts()
     }
 
