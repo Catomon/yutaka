@@ -68,7 +68,7 @@ fun YutakaIcon(
                 colorFilter = ColorFilter.tint(outlineColor),
                 modifier = Modifier
                     .fillMaxSize()
-                    .graphicsLayer(scaleX = 1.18f, scaleY = 1.18f),
+                    .graphicsLayer(scaleX = 1.3f, scaleY = 1.3f),
             )
         }
         Image(

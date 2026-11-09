@@ -114,8 +114,6 @@ fun YutakaV2Screen(
             YutakaHeader(
                 onOpenMenu = { isMenuOpen = true },
                 onMinimize = { windowManager.minimize() },
-                onMaximize = { windowManager.maximize() },
-                onClose = { windowManager.closeWindow() },
                 dragModifier = Modifier.yutakaWindowDrag(window),
             )
 
